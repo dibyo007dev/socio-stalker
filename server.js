@@ -1,8 +1,23 @@
 const express = require("express");
+const mongoose = require("mongoose");
 
 // Initialization of express
 
 const app = express();
+
+// DB config
+
+const db = require("./config/keys").mongoURI;
+
+// Connect to mongo DB
+
+mongoose
+  .connect(
+    db,
+    { useNewUrlParser: true }
+  )
+  .then(() => console.log("MongoDB connected ..."))
+  .catch(err => console.log(err));
 
 // Setting an initial route which says "Hello World " Just for check
 
