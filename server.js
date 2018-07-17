@@ -1,16 +1,19 @@
 const express = require("express");
 const mongoose = require("mongoose");
 
-// Initialization of express
+// Require all the routes
 
+const users = require("./routes/api/users");
+const profile = require("./routes/api/profile");
+const posts = require("./routes/api/posts");
+
+// Initialization of express
 const app = express();
 
 // DB config
-
 const db = require("./config/keys").mongoURI;
 
 // Connect to mongo DB
-
 mongoose
   .connect(
     db,
@@ -18,6 +21,11 @@ mongoose
   )
   .then(() => console.log("MongoDB connected ..."))
   .catch(err => console.log(err));
+
+//-------------------- USE Routes ------------------ //
+app.use("/api/users", users);
+app.use("/api/posts", posts);
+app.use("/api/profile", profile);
 
 // Setting an initial route which says "Hello World " Just for check
 
