@@ -17,6 +17,12 @@ const User = require("../../models/User");
 // For making protected route
 const passport = require("passport");
 
+//------------------ Load Validation ------------------//
+const validateRegisterInput = require("../../validation/registration");
+const validateLoginInput = require("../../validation/login");
+
+//-----------------------------------------------------//
+
 // @route   GET api/users/test
 // @desc    Tests Posts Route
 // @access  Public
@@ -32,11 +38,16 @@ router.get("/test", (req, res) => {
 // @access  Public
 
 router.post("/register", (req, res) => {
+  const { errors, isValid } = validateRegisterInput(req.body);
+
+  if (!isValid) {
+    return res.status(400).json(errors);
+  }
+
   User.findOne({ email: req.body.email }).then(user => {
     if (user) {
-      return res.status(400).json({
-        email: "Email already exists"
-      });
+      errors.email = "Email already exists";
+      return res.status(400).json(errors);
     } else {
       const avatar = gravatar.url("emerleite@gmail.com", {
         s: "200", // Size
@@ -74,13 +85,19 @@ router.post("/register", (req, res) => {
 // @access  Public
 
 router.post("/login", (req, res) => {
+  const { errors, isValid } = validateLoginInput(req.body);
+
+  if (!isValid) {
+    return res.status(400).json(errors);
+  }
   const email = req.body.email;
 
   const password = req.body.password;
 
   User.findOne({ email }).then(user => {
     // Check User
-    if (!user) return res.status(404).json({ email: "User Not found" });
+    errors.email = "User Not found";
+    if (!user) return res.status(404).json(errors);
 
     // Check Password
 
@@ -108,7 +125,8 @@ router.post("/login", (req, res) => {
           }
         );
       } else {
-        return res.status(400).json({ password: "Password incorrect" });
+        errors.password = "Password Incorrect";
+        return res.status(400).json(errors);
       }
     });
   });
@@ -125,7 +143,8 @@ router.get(
     res.json({
       id: req.user.id,
       name: req.user.name,
-      email: req.user.email
+      email: req.user.email,
+      avatar: req.user.avatar
     });
   }
 );
