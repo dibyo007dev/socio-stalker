@@ -18,7 +18,7 @@ const User = require("../../models/User");
 const passport = require("passport");
 
 //------------------ Load Validation ------------------//
-const validateRegisterInput = require("../../validation/registration");
+const validateRegisterInput = require("../../validation/register");
 const validateLoginInput = require("../../validation/login");
 
 //-----------------------------------------------------//

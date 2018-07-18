@@ -11,6 +11,10 @@ const Profile = require("../../models/Profile");
 // Load User Model
 const User = require("../../models/User");
 
+//------------------ Load Validation ------------------//
+const validateProfileInput = require("../../validation/profile");
+//-----------------------------------------------------//
+
 // @route   GET api/profile/test
 // @desc    Tests Posts Route
 // @access  Public
@@ -32,6 +36,7 @@ router.get(
     const errors = {};
 
     Profile.findOne({ user: req.user.id })
+      .populate("user", ["name", "avatar"])
       .then(profile => {
         if (!profile) {
           errors.noProfile = "There is no profile for this user";
@@ -43,6 +48,24 @@ router.get(
   }
 );
 
+// @route   GET api/profile/handle/:handle          // Its a backend api route it gets hit by the frontend
+// @desc    Get Profile by handle
+// @access  Public
+
+// router.get("/handle/:handle", (req, res) => {
+//   const errors = {};
+//   Profile.findOne({
+//     handle: req.params.handle
+//   })
+//     .populate("user", ["name", "avatar "])
+//     .then(profile => {
+//       if (!profile) {
+//         errors.noProfile = "There is no profile for this user ";
+//         res.status(400).json(errors);
+//       }
+//     });
+// });
+
 // @route   POST api/profile
 // @desc    Create or Update current users profile
 // @access  Private
@@ -51,6 +74,13 @@ router.post(
   "/",
   passport.authenticate("jwt", { session: false }),
   (req, res) => {
+    // Get validation func
+    const { errors, isValid } = validateProfileInput(req.body);
+
+    // Check Validation
+    if (!isValid) {
+      res.status(404).json(errors);
+    }
     // Get Feilds
     const profileFeilds = {};
 
@@ -83,11 +113,13 @@ router.post(
     Profile.findOne({ user: req.user.id }).then(profile => {
       if (profile) {
         // Update
-        Profile.findByIdAndUpdate(
+        Profile.findOneAndUpdate(
           { user: req.user.id },
           { $set: profileFeilds },
           { new: true }
-        ).then(profile => res.json(profile));
+        )
+          .then(profile => res.json(profile))
+          .catch(err => res.status(400).json(err));
       } else {
         //Create
 
