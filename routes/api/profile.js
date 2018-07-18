@@ -48,6 +48,24 @@ router.get(
   }
 );
 
+// @route   GET api/profile/all
+// @desc    Get all the profiles
+// @access  Public
+
+router.get("/all", (req, res) => {
+  errors = {};
+  Profile.find()
+    .populate("user", ["name", "avatar"])
+    .then(profiles => {
+      if (!profiles) {
+        errors.noProfiles = "No Profiles present";
+        return res.status(404).json(errors);
+      }
+      res.json(profiles);
+    })
+    .catch(err => res.status(404).json(err));
+});
+
 // @route   GET api/profile/handle/:handle          // Its a backend api route it gets hit by the frontend
 // @desc    Get Profile by handle
 // @access  Public
@@ -66,7 +84,7 @@ router.get("/handle/:handle", (req, res) => {
       res.json(profile);
     })
     .catch(err => {
-      res.status(404).json(err);
+      res.status(404).json({ profile: "There are no profiles" });
     });
 });
 
