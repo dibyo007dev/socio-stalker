@@ -36,7 +36,7 @@ router.get("/", (req, res) => {
 });
 
 // @route   GET api/posts/:id
-// @desc    Fetch posts by ID
+// @desc    Get posts by ID
 // @access  Public
 
 router.get("/:id", (req, res) => {
