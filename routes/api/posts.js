@@ -14,6 +14,7 @@ const Profile = require("../../models/Profile");
 
 //------------------ Load Validation ------------------//
 const validatePostInput = require("../../validation/post");
+const validateCommentInput = require("../../validation/comment");
 
 //-----------------------------------------------------//
 
@@ -168,6 +169,83 @@ router.post(
         })
         .catch(err => res.status(404).json("Post Not Found "));
     });
+  }
+);
+
+// @route   POST api/posts/comment/:id
+// @desc    Add comment to a post
+// @access  Private
+
+router.post(
+  "/comment/:id",
+  passport.authenticate("jwt", { session: false }),
+  (req, res) => {
+    const { errors, isValid } = validateCommentInput(req.body);
+
+    // Check for Validation
+    if (!isValid) {
+      return res.status(400).json(errors);
+    }
+    Post.findById(req.params.id)
+      .then(post => {
+        const newComment = {
+          text: req.body.text,
+          name: req.body.name,
+          avatar: req.body.avatar,
+          user: req.user.id
+        };
+        // Add to comments array
+        post.comments.unshift(newComment);
+        // console.log(post);
+
+        // Save
+        post
+          .save()
+          .then(post => res.json(post))
+          .catch(err => res.status(400).json(err));
+      })
+      .catch(err => res.status(400).json({ postNotFound: "No post found" }));
+  }
+);
+
+// @route   DELETE api/posts/comment/:id/:comment_id
+// @desc    Add comment to a post
+// @access  Private
+
+router.delete(
+  "/comment/:id/:comment_id",
+  passport.authenticate("jwt", { session: false }),
+  (req, res) => {
+    Post.findById(req.params.id)
+      .then(post => {
+        // First check to see if the comment is present
+
+        // If not present respond with an error
+        if (
+          post.comments.filter(
+            comment => comment._id.toString() === req.params.comment_id
+          ).length === 0
+        ) {
+          return res
+            .status(404)
+            .json({ commentnotpresent: "No comment with this ID" });
+        }
+        // If present delete it
+
+        const removeIndex = post.comments
+          .map(item => item._id.toString())
+          .indexOf(req.params.comment_id);
+
+        // Splice it out of the array
+
+        post.comments.splice(removeIndex, 1);
+
+        post
+          .save()
+          .then(post => res.json(post))
+          .catch(err => res.json(err));
+      })
+      .catch(err => res.status(400).json({ postNotFound: "No post found" }));
   }
 );
 
