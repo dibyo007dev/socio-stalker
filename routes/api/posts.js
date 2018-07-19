@@ -35,6 +35,16 @@ router.get("/", (req, res) => {
     .catch(err => res.status(404).json(err));
 });
 
+// @route   GET api/posts/:id
+// @desc    Fetch posts by ID
+// @access  Public
+
+router.get("/:id", (req, res) => {
+  Post.findById(req.params.id)
+    .then(post => res.json(post))
+    .catch(err => res.status(404).json(err));
+});
+
 // @route   POST api/posts
 // @desc    Create Posts
 // @access  Private
