@@ -2,7 +2,7 @@ const validator = require("validator");
 // Globally def func
 const isEmpty = require("./is-empty");
 
-module.exports = function validateRegisterInput(data) {
+module.exports = function validateLoginInput(data) {
   let errors = {};
 
   // We will check for the emptyness of the error to check if its valid or not
