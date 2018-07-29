@@ -21,31 +21,29 @@ module.exports = function validateRegisterInput(data) {
   }
 
   if (validator.isEmpty(data.name)) {
-    errors.name = "Name feild is required ";
+    errors.name = "Name field is required ";
   }
-
-  if (validator.isEmpty(data.email)) {
-    errors.email = "Email feild is required ";
-  }
-
-  if (validator.isEmail(data.email)) {
+  if (!validator.isEmail(data.email)) {
     errors.email = "Email is invalid ";
   }
 
+  if (validator.isEmpty(data.email)) {
+    errors.email = "Email field is required ";
+  }
+
   if (validator.isEmpty(data.password)) {
-    errors.password = "Password feild is required ";
+    errors.password = "Password field is required ";
   }
 
   if (!validator.isLength(data.password, { min: 6, max: 30 })) {
     errors.password = "Password must be atleast 6 characters";
   }
 
-  if (validator.isEmpty(data.confirm_password)) {
-    errors.confirm_password = "Password feild is required ";
-  }
-
   if (!validator.equals(data.password, data.confirm_password)) {
     errors.confirm_password = "Passwords must match";
+  }
+  if (validator.isEmpty(data.confirm_password)) {
+    errors.confirm_password = "Confirm Password field is required ";
   }
 
   return {
