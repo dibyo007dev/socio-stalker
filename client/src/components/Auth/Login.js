@@ -1,11 +1,17 @@
 import React, { Component } from "react";
+import PropTypes from "prop-types";
+import { connect } from "react-redux";
+import { withRouter } from "react-router-dom";
+import classnames from "classnames";
+import { loginUser } from "../../actions/authActions";
 
 class Login extends Component {
   constructor() {
     super();
     this.state = {
       email: "",
-      password: ""
+      password: "",
+      errors: {}
     };
     this.onChange = this.onChange.bind(this);
     this.onSubmit = this.onSubmit.bind(this);
@@ -27,6 +33,7 @@ class Login extends Component {
   }
 
   render() {
+    const { errors } = this.state;
     return (
       <div className="login">
         <div className="container">
@@ -40,7 +47,9 @@ class Login extends Component {
                 <div className="form-group">
                   <input
                     type="email"
-                    className="form-control form-control-lg"
+                    className={classnames("form-control form-control-lg", {
+                      "is-invalid": errors.name
+                    })}
                     placeholder="Email Address"
                     name="email"
                     value={this.state.email}
@@ -66,5 +75,18 @@ class Login extends Component {
     );
   }
 }
+Login.PropTypes = {
+  loginUser: PropTypes.func.isRequired,
+  auth: PropTypes.object.isRequired,
+  errors: PropTypes.object.isRequired
+};
 
-export default Login;
+const mapStateToProps = state => ({
+  auth: state.auth,
+  errors: state.errors
+});
+
+export default connect(
+  null,
+  { loginUser }
+)(withRouter(Login));
